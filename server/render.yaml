@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: zeesu-meet-server
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.0.0
+      - key: CLIENT_URL
+        value: "*"

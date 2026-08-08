@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import peer from "../service/peer";
 import { useSocket } from "../context/SocketProvider";
 import {
+  BrightCallLogo,
   MicIcon,
   MicOffIcon,
   VideoIcon,
@@ -14,7 +15,7 @@ import {
   CloseIcon,
   SendIcon,
   UsersIcon,
-  SparklesIcon,
+  ShieldCheckIcon,
 } from "../components/Icons";
 
 const RoomPage = () => {
@@ -393,126 +394,146 @@ const RoomPage = () => {
   };
 
   return (
-    <div className="room-wrapper">
-      {/* Toast Notice */}
+    <div className="brightcall-room-wrapper">
+      {/* Toast Notification */}
       {toastMessage && <div className="toast-notice">{toastMessage}</div>}
 
-      {/* Top Navbar */}
-      <header className="room-navbar">
-        <div className="nav-brand">
-          <SparklesIcon size={20} /> Zeesu<span>Meet</span>
+      {/* Top BrightCall Room Navbar */}
+      <header className="bc-room-navbar">
+        <div className="bc-room-brand" onClick={() => navigate("/")}>
+          <BrightCallLogo size={26} />
+          <span>BrightCall</span>
         </div>
 
-        <div className="room-info-pill">
+        <div className="bc-room-pill-info">
           <span>Room: <strong>{roomId}</strong></span>
-          <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }} onClick={copyRoomLink}>
-            <CopyIcon size={14} /> Copy Link
+          <ShieldCheckIcon size={14} style={{ color: "#10b981" }} />
+          <button className="bc-copy-link-btn" onClick={copyRoomLink}>
+            <CopyIcon size={12} /> Copy Link
           </button>
         </div>
 
-        <div className="badge badge-success">
-          <UsersIcon size={14} /> {remoteSocketId ? "2 In Meeting" : "1 In Meeting"}
+        <div className="bc-room-right-actions">
+          <div className="bc-user-count-badge">
+            <UsersIcon size={14} /> {remoteSocketId ? "2 In Call" : "1 In Call"}
+          </div>
+          <button className="bc-leave-room-btn" onClick={leaveRoom}>
+            <PhoneOffIcon size={14} /> Leave
+          </button>
         </div>
       </header>
 
-      {/* Connection Prompt Banner */}
+      {/* Peer Connection Banner Prompt */}
       {remoteSocketId && !remoteStream && (
         <div className="call-prompt-banner">
           <span>A peer is in the room! Connect WebRTC video call?</span>
-          <button className="btn btn-primary" style={{ padding: "6px 16px" }} onClick={handleCallUser}>
+          <button className="bc-btn-primary" style={{ padding: "6px 16px" }} onClick={handleCallUser}>
             Start Video Call
           </button>
         </div>
       )}
 
-      {/* Main Area */}
-      <main className="room-main">
-        {/* Video Grid */}
-        <div className="video-grid-container">
-          {/* Local Stream Card */}
-          <div className="video-card">
+      {/* Main Video Call Area */}
+      <main className="bc-room-main">
+        <div className="bc-room-video-container">
+          {/* Local User Video Tile */}
+          <div className="bc-room-video-card active-stream">
             {isCameraOn ? (
               <video
                 ref={localVideoRef}
                 autoPlay
                 playsInline
                 muted
-                className={`video-element ${isScreenSharing ? "" : "mirrored"}`}
+                className={`bc-room-video-element ${isScreenSharing ? "" : "mirrored"}`}
               />
             ) : (
-              <div className="avatar-placeholder">{userEmail[0]?.toUpperCase() || "U"}</div>
+              <div className="bc-avatar-fallback">{userEmail[0]?.toUpperCase() || "U"}</div>
             )}
 
-            <div className="video-overlay-bottom">
+            <div className="bc-room-overlay-bottom">
               <span>{userEmail} (You)</span>
-              {isScreenSharing && <span className="badge badge-warning" style={{ fontSize: "0.65rem" }}>Sharing Screen</span>}
+              {isScreenSharing && (
+                <span className="badge badge-warning" style={{ fontSize: "0.65rem" }}>
+                  Sharing Screen
+                </span>
+              )}
             </div>
 
-            <div className="video-overlay-top-right">
-              <div className={`status-icon-pill ${!isMicOn ? "muted" : ""}`}>
+            <div className="bc-room-overlay-top-right">
+              <div className={`bc-room-mic-status ${!isMicOn ? "muted" : ""}`}>
                 {isMicOn ? <MicIcon size={14} /> : <MicOffIcon size={14} />}
               </div>
             </div>
           </div>
 
-          {/* Remote Stream Card */}
+          {/* Remote Peer Video Tile */}
           {remoteSocketId ? (
-            <div className="video-card">
+            <div className="bc-room-video-card active-stream">
               {remoteCameraOn && remoteStream ? (
-                <video ref={remoteVideoRef} autoPlay playsInline className="video-element" />
+                <video ref={remoteVideoRef} autoPlay playsInline className="bc-room-video-element" />
               ) : (
-                <div className="avatar-placeholder">{remoteEmail[0]?.toUpperCase() || "P"}</div>
+                <div className="bc-avatar-fallback">{remoteEmail[0]?.toUpperCase() || "P"}</div>
               )}
 
-              <div className="video-overlay-bottom">
+              <div className="bc-room-overlay-bottom">
                 <span>{remoteEmail || "Remote Peer"}</span>
               </div>
 
-              <div className="video-overlay-top-right">
-                <div className={`status-icon-pill ${!remoteMicOn ? "muted" : ""}`}>
+              <div className="bc-room-overlay-top-right">
+                <div className={`bc-room-mic-status ${!remoteMicOn ? "muted" : ""}`}>
                   {remoteMicOn ? <MicIcon size={14} /> : <MicOffIcon size={14} />}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="video-card" style={{ background: "rgba(255,255,255,0.02)" }}>
-              <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "2rem" }}>
-                <UsersIcon size={48} style={{ marginBottom: "1rem", opacity: 0.4 }} />
+            <div className="bc-room-video-card">
+              <div className="bc-waiting-card">
+                <UsersIcon size={44} style={{ marginBottom: "0.75rem", opacity: 0.5, color: "#6a55ea" }} />
                 <h3>Waiting for others to join...</h3>
-                <p style={{ fontSize: "0.85rem", marginTop: "0.5rem" }}>
-                  Share room code <strong>{roomId}</strong> with your invitees.
-                </p>
-                <button className="btn btn-secondary" style={{ marginTop: "1rem" }} onClick={copyRoomLink}>
-                  <CopyIcon size={16} /> Copy Invite Link
+                <p>Share the room code <strong>{roomId}</strong> to start collaborating.</p>
+                <button className="bc-copy-link-btn" style={{ margin: "0 auto", padding: "6px 14px" }} onClick={copyRoomLink}>
+                  <CopyIcon size={14} /> Copy Invite Link
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Chat Drawer */}
+        {/* Side Chat Drawer */}
         {isChatOpen && (
-          <aside className="chat-drawer">
-            <div className="chat-header">
+          <aside className="bc-room-chat-drawer">
+            <div className="bc-chat-header">
               <span>In-Meeting Chat</span>
-              <button className="btn btn-secondary" style={{ padding: "4px" }} onClick={() => setIsChatOpen(false)}>
-                <CloseIcon size={16} />
+              <button
+                className="bc-top-icon-btn"
+                style={{ width: 28, height: 28 }}
+                onClick={() => setIsChatOpen(false)}
+              >
+                <CloseIcon size={14} />
               </button>
             </div>
 
-            <div className="chat-messages">
+            <div className="bc-chat-messages">
               {chatMessages.length === 0 ? (
-                <div style={{ textAlign: "center", color: "var(--text-dim)", marginTop: "auto", marginBottom: "auto", fontSize: "0.85rem" }}>
+                <div
+                  style={{
+                    textAlign: "center",
+                    color: "rgba(255, 255, 255, 0.4)",
+                    marginTop: "auto",
+                    marginBottom: "auto",
+                    fontSize: "0.85rem",
+                  }}
+                >
                   No messages yet. Say hello!
                 </div>
               ) : (
                 chatMessages.map((msg) => {
                   const isMine = msg.sender === userEmail || msg.senderId === socket?.id;
                   return (
-                    <div key={msg.id} className={`chat-bubble ${isMine ? "mine" : "other"}`}>
-                      {!isMine && <div className="chat-sender">{msg.sender}</div>}
+                    <div key={msg.id} className={`bc-chat-bubble ${isMine ? "mine" : "other"}`}>
+                      {!isMine && <div className="bc-chat-sender">{msg.sender}</div>}
                       <div>{msg.message}</div>
-                      <div className="chat-time">{msg.time}</div>
+                      <div className="bc-chat-time">{msg.time}</div>
                     </div>
                   );
                 })
@@ -520,26 +541,26 @@ const RoomPage = () => {
               <div ref={chatBottomRef} />
             </div>
 
-            <form onSubmit={sendChatMessage} className="chat-input-box">
+            <form onSubmit={sendChatMessage} className="bc-chat-input-box">
               <input
                 type="text"
-                className="input-field"
+                className="bc-chat-input"
                 placeholder="Type a message..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
               />
-              <button type="submit" className="btn btn-primary" style={{ padding: "0 14px" }}>
-                <SendIcon size={16} />
+              <button type="submit" className="bc-chat-send-btn">
+                <SendIcon size={15} />
               </button>
             </form>
           </aside>
         )}
       </main>
 
-      {/* Floating Glass Control Toolbar */}
-      <footer className="control-toolbar">
+      {/* Floating Bottom Control Toolbar */}
+      <footer className="bc-room-toolbar">
         <button
-          className={`btn-control ${!isMicOn ? "off" : "active"}`}
+          className={`bc-room-ctrl-btn ${!isMicOn ? "off" : "active"}`}
           onClick={toggleMic}
           title={isMicOn ? "Mute Microphone" : "Unmute Microphone"}
         >
@@ -547,7 +568,7 @@ const RoomPage = () => {
         </button>
 
         <button
-          className={`btn-control ${!isCameraOn ? "off" : "active"}`}
+          className={`bc-room-ctrl-btn ${!isCameraOn ? "off" : "active"}`}
           onClick={toggleCamera}
           title={isCameraOn ? "Turn Camera Off" : "Turn Camera On"}
         >
@@ -555,7 +576,7 @@ const RoomPage = () => {
         </button>
 
         <button
-          className={`btn-control ${isScreenSharing ? "active" : ""}`}
+          className={`bc-room-ctrl-btn ${isScreenSharing ? "active" : ""}`}
           onClick={toggleScreenShare}
           title={isScreenSharing ? "Stop Screen Share" : "Share Screen"}
         >
@@ -563,14 +584,14 @@ const RoomPage = () => {
         </button>
 
         <button
-          className={`btn-control ${isChatOpen ? "active" : ""}`}
+          className={`bc-room-ctrl-btn ${isChatOpen ? "active" : ""}`}
           onClick={() => setIsChatOpen(!isChatOpen)}
           title="Toggle In-Meeting Chat"
         >
           <ChatIcon size={20} />
         </button>
 
-        <button className="btn-control end-call" onClick={leaveRoom} title="Leave Meeting">
+        <button className="bc-room-ctrl-btn end-call" onClick={leaveRoom} title="Leave Meeting">
           <PhoneOffIcon size={20} />
         </button>
       </footer>
@@ -579,4 +600,3 @@ const RoomPage = () => {
 };
 
 export default RoomPage;
-

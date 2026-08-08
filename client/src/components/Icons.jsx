@@ -88,3 +88,57 @@ export const CloseIcon = ({ size = 18, className = "" }) => (
     <line x1="6" y1="6" x2="18" y2="18"></line>
   </svg>
 );
+
+export const CodeIcon = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="16 18 22 12 16 6"></polyline>
+    <polyline points="8 6 2 12 8 18"></polyline>
+  </svg>
+);
+
+export const ArrowRightIcon = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+    <polyline points="12 5 19 12 12 19"></polyline>
+  </svg>
+);
+
+export const BrightCallLogo = ({ size = 26, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+    <rect width="32" height="32" rx="8" fill="#111827" />
+    <path d="M10 8H18C20.2091 8 22 9.79086 22 12C22 13.5699 21.0954 14.9287 19.7826 15.575C21.4391 16.208 22.6 17.8182 22.6 19.7C22.6 22.0748 20.6748 24 18.3 24H10V8Z" fill="#6A55EA"/>
+    <circle cx="16" cy="12" r="2" fill="#FFFFFF" />
+    <circle cx="16" cy="19" r="2" fill="#FFFFFF" />
+  </svg>
+);
+
+export const LayoutGridIcon = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+  </svg>
+);
+
+export const ShieldCheckIcon = ({ size = 16, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    <polyline points="9 12 11 14 15 10"></polyline>
+  </svg>
+);
+
+export const HandIcon = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 11V6a2 2 0 0 0-4 0v4M14 4a2 2 0 0 0-4 0v6M10 4.5a2 2 0 0 0-4 0V12M6 10.5a2 2 0 0 0-4 0V16a8 8 0 0 0 16 0v-5a2 2 0 0 0-4 0"></path>
+  </svg>
+);
+
+export const MoreHorizontalIcon = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="1.5"></circle>
+    <circle cx="19" cy="12" r="1.5"></circle>
+    <circle cx="5" cy="12" r="1.5"></circle>
+  </svg>
+);
+

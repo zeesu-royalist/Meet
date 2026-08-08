@@ -49,10 +49,23 @@ const RoomPage = () => {
   const screenTrackRef = useRef(null);
   const chatBottomRef = useRef(null);
 
-  const showToast = (msg) => {
+  // Refs for stable access in callbacks without triggering re-render loops
+  const myStreamRef = useRef(null);
+  const remoteSocketIdRef = useRef(null);
+  const callingRef = useRef(false);
+
+  useEffect(() => {
+    myStreamRef.current = myStream;
+  }, [myStream]);
+
+  useEffect(() => {
+    remoteSocketIdRef.current = remoteSocketId;
+  }, [remoteSocketId]);
+
+  const showToast = useCallback((msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 3500);
-  };
+  }, []);
 
   // 1. Acquire media stream on mount
   useEffect(() => {
@@ -77,7 +90,7 @@ const RoomPage = () => {
         activeStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [showToast]);
 
   // Update local video element when stream is ready
   useEffect(() => {
@@ -86,7 +99,7 @@ const RoomPage = () => {
     }
   }, [myStream]);
 
-  // Update remote video element when stream is ready with autoplay trigger
+  // Update remote video element when stream is ready
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
@@ -103,78 +116,29 @@ const RoomPage = () => {
     }
   }, [chatMessages, isChatOpen]);
 
-  // 2. WebRTC Call Initiation (Caller)
-  const handleCallUser = useCallback(async (targetId) => {
-    const target = targetId || remoteSocketId;
-    if (!target || !myStream) return;
+  // 2. WebRTC Call Initiation (Caller - Auto-starts call)
+  const handleCallUser = useCallback(
+    async (targetId) => {
+      const target = targetId || remoteSocketIdRef.current;
+      const currentStream = myStreamRef.current;
+      if (!target || !currentStream || callingRef.current) return;
 
-    peer.resetPeer();
-
-    // Attach tracks
-    myStream.getTracks().forEach((track) => peer.peer.addTrack(track, myStream));
-
-    // Handle ICE Candidates
-    peer.peer.onicecandidate = (event) => {
-      if (event.candidate && target) {
-        socket.emit("peer:ice-candidate", { to: target, candidate: event.candidate });
-      }
-    };
-
-    // Handle Remote Track with fallback for ev.track
-    peer.peer.ontrack = (ev) => {
-      if (ev.streams && ev.streams[0]) {
-        setRemoteStream(ev.streams[0]);
-      } else if (ev.track) {
-        setRemoteStream(new MediaStream([ev.track]));
-      }
-    };
-
-    const offer = await peer.getOffer();
-    socket.emit("user:call", { to: target, offer });
-    showToast("Connecting video call...");
-  }, [remoteSocketId, myStream, socket]);
-
-  // Auto-connect call when peer joins & stream is ready
-  useEffect(() => {
-    if (remoteSocketId && myStream && !remoteStream) {
-      handleCallUser(remoteSocketId);
-    }
-  }, [remoteSocketId, myStream, remoteStream, handleCallUser]);
-
-  // 3. Remote User Joined
-  const handleUserJoined = useCallback(
-    ({ email, id }) => {
-      setRemoteSocketId(id);
-      setRemoteEmail(email || "Peer");
-      showToast(`${email || "A peer"} joined the room!`);
-      if (myStream) {
-        handleCallUser(id);
-      }
-    },
-    [myStream, handleCallUser]
-  );
-
-  // 4. Handle Incoming Call (Receiver)
-  const handleIncommingCall = useCallback(
-    async ({ from, email, offer }) => {
-      setRemoteSocketId(from);
-      if (email) setRemoteEmail(email);
-
+      callingRef.current = true;
       peer.resetPeer();
 
-      // Attach tracks
-      if (myStream) {
-        myStream.getTracks().forEach((track) => peer.peer.addTrack(track, myStream));
-      }
+      // Attach local stream tracks
+      currentStream.getTracks().forEach((track) => {
+        peer.peer.addTrack(track, currentStream);
+      });
 
       // Handle ICE Candidates
       peer.peer.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket.emit("peer:ice-candidate", { to: from, candidate: event.candidate });
+        if (event.candidate && target && socket) {
+          socket.emit("peer:ice-candidate", { to: target, candidate: event.candidate });
         }
       };
 
-      // Handle Remote Track with fallback
+      // Handle Remote Track
       peer.peer.ontrack = (ev) => {
         if (ev.streams && ev.streams[0]) {
           setRemoteStream(ev.streams[0]);
@@ -183,20 +147,92 @@ const RoomPage = () => {
         }
       };
 
-      const ans = await peer.getAnswer(offer);
-      socket.emit("call:accepted", { to: from, ans });
-      showToast("Call connected!");
+      try {
+        const offer = await peer.getOffer();
+        if (socket) {
+          socket.emit("user:call", { to: target, offer });
+        }
+        showToast("Connecting video call...");
+      } catch (err) {
+        console.error("Error initiating offer:", err);
+        callingRef.current = false;
+      }
     },
-    [socket, myStream]
+    [socket, showToast]
+  );
+
+  // Auto-connect call when peer joins & stream is ready
+  useEffect(() => {
+    if (remoteSocketId && myStream && !remoteStream && !callingRef.current) {
+      handleCallUser(remoteSocketId);
+    }
+  }, [remoteSocketId, myStream, remoteStream, handleCallUser]);
+
+  // 3. Remote User Joined
+  const handleUserJoined = useCallback(
+    ({ email, id }) => {
+      callingRef.current = false;
+      setRemoteSocketId(id);
+      setRemoteEmail(email || "Peer");
+      showToast(`${email || "A peer"} joined the room!`);
+      if (myStreamRef.current) {
+        handleCallUser(id);
+      }
+    },
+    [handleCallUser, showToast]
+  );
+
+  // 4. Handle Incoming Call (Receiver - Auto-answers call)
+  const handleIncommingCall = useCallback(
+    async ({ from, email, offer }) => {
+      setRemoteSocketId(from);
+      if (email) setRemoteEmail(email);
+
+      peer.resetPeer();
+
+      const currentStream = myStreamRef.current;
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => peer.peer.addTrack(track, currentStream));
+      }
+
+      peer.peer.onicecandidate = (event) => {
+        if (event.candidate && socket) {
+          socket.emit("peer:ice-candidate", { to: from, candidate: event.candidate });
+        }
+      };
+
+      peer.peer.ontrack = (ev) => {
+        if (ev.streams && ev.streams[0]) {
+          setRemoteStream(ev.streams[0]);
+        } else if (ev.track) {
+          setRemoteStream(new MediaStream([ev.track]));
+        }
+      };
+
+      try {
+        const ans = await peer.getAnswer(offer);
+        if (socket) {
+          socket.emit("call:accepted", { to: from, ans });
+        }
+        showToast("Call connected!");
+      } catch (err) {
+        console.error("Error answering incoming call:", err);
+      }
+    },
+    [socket, showToast]
   );
 
   // 5. Call Accepted
   const handleCallAccepted = useCallback(
     async ({ from, ans }) => {
-      await peer.setLocalDescription(ans);
-      showToast("Peer accepted call! Connection established.");
+      try {
+        await peer.setLocalDescription(ans);
+        showToast("Call connected!");
+      } catch (err) {
+        console.error("Error setting local description for answer:", err);
+      }
     },
-    []
+    [showToast]
   );
 
   // 6. ICE Candidate Received
@@ -208,14 +244,24 @@ const RoomPage = () => {
 
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }) => {
-      const ans = await peer.getAnswer(offer);
-      socket.emit("peer:nego:done", { to: from, ans });
+      try {
+        const ans = await peer.getAnswer(offer);
+        if (socket) {
+          socket.emit("peer:nego:done", { to: from, ans });
+        }
+      } catch (err) {
+        console.error("Error handling negotiation incoming:", err);
+      }
     },
     [socket]
   );
 
   const handleNegoNeedFinal = useCallback(async ({ ans }) => {
-    await peer.setLocalDescription(ans);
+    try {
+      await peer.setLocalDescription(ans);
+    } catch (err) {
+      console.error("Error handling negotiation final:", err);
+    }
   }, []);
 
   // 8. Media Status Sync (Remote Mic/Camera updates)
@@ -230,21 +276,32 @@ const RoomPage = () => {
   }, []);
 
   // 10. User Left
-  const handleUserLeft = useCallback(({ email }) => {
-    setRemoteSocketId(null);
-    setRemoteStream(null);
-    setRemoteEmail("");
-    showToast(`${email || "Peer"} left the meeting.`);
-  }, []);
+  const handleUserLeft = useCallback(
+    ({ email }) => {
+      callingRef.current = false;
+      setRemoteSocketId(null);
+      setRemoteStream(null);
+      setRemoteEmail("");
+      peer.resetPeer();
+      showToast(`${email || "Peer"} left the meeting.`);
+    },
+    [showToast]
+  );
 
-  // 10. Existing Room Users Sync
-  const handleRoomUsers = useCallback(({ existingUsers }) => {
-    if (existingUsers && existingUsers.length > 0) {
-      const firstUser = existingUsers[0];
-      setRemoteSocketId(firstUser.id);
-      if (firstUser.email) setRemoteEmail(firstUser.email);
-    }
-  }, []);
+  // 11. Existing Room Users Sync
+  const handleRoomUsers = useCallback(
+    ({ existingUsers }) => {
+      if (existingUsers && existingUsers.length > 0) {
+        const firstUser = existingUsers[0];
+        setRemoteSocketId(firstUser.id);
+        if (firstUser.email) setRemoteEmail(firstUser.email);
+        if (myStreamRef.current && !callingRef.current) {
+          handleCallUser(firstUser.id);
+        }
+      }
+    },
+    [handleCallUser]
+  );
 
   // Setup Socket listeners
   useEffect(() => {
@@ -383,6 +440,7 @@ const RoomPage = () => {
   };
 
   const leaveRoom = () => {
+    callingRef.current = false;
     if (myStream) {
       myStream.getTracks().forEach((t) => t.stop());
     }
@@ -402,11 +460,15 @@ const RoomPage = () => {
       <header className="bc-room-navbar">
         <div className="bc-room-brand" onClick={() => navigate("/")}>
           <ZeesuMeetLogo size={26} />
-          <span>Zeesu<span style={{ color: "var(--primary-purple-hover)" }}>Meet</span></span>
+          <span>
+            Zeesu<span style={{ color: "var(--primary-purple-hover)" }}>Meet</span>
+          </span>
         </div>
 
         <div className="bc-room-pill-info">
-          <span>Room: <strong>{roomId}</strong></span>
+          <span>
+            Room: <strong>{roomId}</strong>
+          </span>
           <ShieldCheckIcon size={14} style={{ color: "#10b981" }} />
           <button className="bc-copy-link-btn" onClick={copyRoomLink}>
             <CopyIcon size={12} /> Copy Link
@@ -422,16 +484,6 @@ const RoomPage = () => {
           </button>
         </div>
       </header>
-
-      {/* Peer Connection Banner Prompt */}
-      {remoteSocketId && !remoteStream && (
-        <div className="call-prompt-banner">
-          <span>A peer is in the room! Connect WebRTC video call?</span>
-          <button className="bc-btn-primary" style={{ padding: "6px 16px" }} onClick={handleCallUser}>
-            Start Video Call
-          </button>
-        </div>
-      )}
 
       {/* Main Video Call Area */}
       <main className="bc-room-main">
@@ -490,8 +542,14 @@ const RoomPage = () => {
               <div className="bc-waiting-card">
                 <UsersIcon size={44} style={{ marginBottom: "0.75rem", opacity: 0.5, color: "#6a55ea" }} />
                 <h3>Waiting for others to join...</h3>
-                <p>Share the room code <strong>{roomId}</strong> to start collaborating.</p>
-                <button className="bc-copy-link-btn" style={{ margin: "0 auto", padding: "6px 14px" }} onClick={copyRoomLink}>
+                <p>
+                  Share the room code <strong>{roomId}</strong> to start collaborating.
+                </p>
+                <button
+                  className="bc-copy-link-btn"
+                  style={{ margin: "0 auto", padding: "6px 14px" }}
+                  onClick={copyRoomLink}
+                >
                   <CopyIcon size={14} /> Copy Invite Link
                 </button>
               </div>

@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import peer from "../service/peer";
 import { useSocket } from "../context/SocketProvider";
 import {
-  BrightCallLogo,
+  ZeesuMeetLogo,
   MicIcon,
   MicOffIcon,
   VideoIcon,
@@ -394,15 +394,15 @@ const RoomPage = () => {
   };
 
   return (
-    <div className="brightcall-room-wrapper">
+    <div className="ZeesuMeet-room-wrapper">
       {/* Toast Notification */}
       {toastMessage && <div className="toast-notice">{toastMessage}</div>}
 
-      {/* Top BrightCall Room Navbar */}
+      {/* Top ZeesuMeet Room Navbar */}
       <header className="bc-room-navbar">
         <div className="bc-room-brand" onClick={() => navigate("/")}>
-          <BrightCallLogo size={26} />
-          <span>BrightCall</span>
+          <ZeesuMeetLogo size={26} />
+          <span>Zeesu<span style={{ color: "var(--primary-purple-hover)" }}>Meet</span></span>
         </div>
 
         <div className="bc-room-pill-info">

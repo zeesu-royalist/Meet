@@ -50,6 +50,15 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit("room:join", { ...data, existingUsers: existingUsersInRoom });
   });
 
+  socket.on("room:get-users", ({ room }) => {
+    if (!roomToSocketsMap.has(room)) return;
+    const existingUsersInRoom = Array.from(roomToSocketsMap.get(room))
+      .filter((id) => id !== socket.id)
+      .map((id) => ({ id, email: socketToUserMap.get(id)?.email }));
+    
+    socket.emit("room:users", { existingUsers: existingUsersInRoom });
+  });
+
   // WebRTC Signaling Calls
   socket.on("user:call", ({ to, offer }) => {
     const user = socketToUserMap.get(socket.id);

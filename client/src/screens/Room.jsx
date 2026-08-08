@@ -85,10 +85,13 @@ const RoomPage = () => {
     }
   }, [myStream]);
 
-  // Update remote video element when stream is ready
+  // Update remote video element when stream is ready with autoplay trigger
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
+      remoteVideoRef.current.play().catch((err) => {
+        console.log("Remote video play trigger:", err);
+      });
     }
   }, [remoteStream]);
 
@@ -100,8 +103,9 @@ const RoomPage = () => {
   }, [chatMessages, isChatOpen]);
 
   // 2. WebRTC Call Initiation (Caller)
-  const handleCallUser = useCallback(async () => {
-    if (!remoteSocketId || !myStream) return;
+  const handleCallUser = useCallback(async (targetId) => {
+    const target = targetId || remoteSocketId;
+    if (!target || !myStream) return;
 
     peer.resetPeer();
 
@@ -110,22 +114,31 @@ const RoomPage = () => {
 
     // Handle ICE Candidates
     peer.peer.onicecandidate = (event) => {
-      if (event.candidate && remoteSocketId) {
-        socket.emit("peer:ice-candidate", { to: remoteSocketId, candidate: event.candidate });
+      if (event.candidate && target) {
+        socket.emit("peer:ice-candidate", { to: target, candidate: event.candidate });
       }
     };
 
-    // Handle Remote Track
+    // Handle Remote Track with fallback for ev.track
     peer.peer.ontrack = (ev) => {
       if (ev.streams && ev.streams[0]) {
         setRemoteStream(ev.streams[0]);
+      } else if (ev.track) {
+        setRemoteStream(new MediaStream([ev.track]));
       }
     };
 
     const offer = await peer.getOffer();
-    socket.emit("user:call", { to: remoteSocketId, offer });
-    showToast("Calling peer...");
+    socket.emit("user:call", { to: target, offer });
+    showToast("Connecting video call...");
   }, [remoteSocketId, myStream, socket]);
+
+  // Auto-connect call when peer joins & stream is ready
+  useEffect(() => {
+    if (remoteSocketId && myStream && !remoteStream) {
+      handleCallUser(remoteSocketId);
+    }
+  }, [remoteSocketId, myStream, remoteStream, handleCallUser]);
 
   // 3. Remote User Joined
   const handleUserJoined = useCallback(
@@ -133,8 +146,11 @@ const RoomPage = () => {
       setRemoteSocketId(id);
       setRemoteEmail(email || "Peer");
       showToast(`${email || "A peer"} joined the room!`);
+      if (myStream) {
+        handleCallUser(id);
+      }
     },
-    []
+    [myStream, handleCallUser]
   );
 
   // 4. Handle Incoming Call (Receiver)
@@ -157,10 +173,12 @@ const RoomPage = () => {
         }
       };
 
-      // Handle Remote Track
+      // Handle Remote Track with fallback
       peer.peer.ontrack = (ev) => {
         if (ev.streams && ev.streams[0]) {
           setRemoteStream(ev.streams[0]);
+        } else if (ev.track) {
+          setRemoteStream(new MediaStream([ev.track]));
         }
       };
 
@@ -218,6 +236,15 @@ const RoomPage = () => {
     showToast(`${email || "Peer"} left the meeting.`);
   }, []);
 
+  // 10. Existing Room Users Sync
+  const handleRoomUsers = useCallback(({ existingUsers }) => {
+    if (existingUsers && existingUsers.length > 0) {
+      const firstUser = existingUsers[0];
+      setRemoteSocketId(firstUser.id);
+      if (firstUser.email) setRemoteEmail(firstUser.email);
+    }
+  }, []);
+
   // Setup Socket listeners
   useEffect(() => {
     if (!socket) return;
@@ -231,6 +258,10 @@ const RoomPage = () => {
     socket.on("media:toggle", handleMediaToggle);
     socket.on("chat:message", handleChatMessage);
     socket.on("user:left", handleUserLeft);
+    socket.on("room:users", handleRoomUsers);
+
+    // Request active room members
+    socket.emit("room:get-users", { room: roomId });
 
     return () => {
       socket.off("user:joined", handleUserJoined);
@@ -242,9 +273,11 @@ const RoomPage = () => {
       socket.off("media:toggle", handleMediaToggle);
       socket.off("chat:message", handleChatMessage);
       socket.off("user:left", handleUserLeft);
+      socket.off("room:users", handleRoomUsers);
     };
   }, [
     socket,
+    roomId,
     handleUserJoined,
     handleIncommingCall,
     handleCallAccepted,
@@ -254,6 +287,7 @@ const RoomPage = () => {
     handleMediaToggle,
     handleChatMessage,
     handleUserLeft,
+    handleRoomUsers,
   ]);
 
   // Media Controls Actions

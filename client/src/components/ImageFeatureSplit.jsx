@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   ClockIcon,
   TrendingUpIcon,
@@ -6,6 +7,13 @@ import {
   ZapIcon,
   VideoIcon,
 } from "./Icons";
+import {
+  viewportConfig,
+  staggerContainer,
+  fadeInUp,
+  fadeInLeft,
+  scaleIn,
+} from "./animations";
 
 const rightFeatures = [
   {
@@ -36,14 +44,23 @@ const ImageFeatureSplit = () => {
       <div className="zm-container">
         <div className="zm-image-split-grid">
           {/* Left Column: Image with Gradient Overlay Label Card */}
-          <div className="zm-split-image-col">
+          <motion.div
+            className="zm-split-image-col"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={fadeInLeft}
+          >
             <div className="zm-image-wrapper">
               <img
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop"
                 alt="Engineering Team Collaborating"
                 className="zm-split-img"
               />
-              <div className="zm-image-overlay-card">
+              <motion.div
+                className="zm-image-overlay-card"
+                variants={scaleIn}
+              >
                 <div className="zm-overlay-badge">
                   <VideoIcon size={16} stroke="#ffffff" />
                 </div>
@@ -51,24 +68,40 @@ const ImageFeatureSplit = () => {
                 <p>
                   Build seamless video pairing habits with our zero-download workspace and instant room links every single day.
                 </p>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column: 2x2 Feature List Grid */}
-          <div className="zm-split-features-col">
+          <motion.div
+            className="zm-split-features-col"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportConfig}
+            variants={staggerContainer}
+          >
             <div className="zm-split-features-grid">
               {rightFeatures.map((feat, idx) => (
-                <div key={idx} className="zm-split-feature-item">
-                  <div className="zm-split-feature-icon-badge">
+                <motion.div
+                  key={idx}
+                  className="zm-split-feature-item"
+                  variants={fadeInUp}
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div
+                    className="zm-split-feature-icon-badge"
+                    whileHover={{ scale: 1.15, rotate: 10 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     {feat.icon}
-                  </div>
+                  </motion.div>
                   <h4 className="zm-split-feature-title">{feat.title}</h4>
                   <p className="zm-split-feature-desc">{feat.description}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

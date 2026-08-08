@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   UsersIcon,
   CodeIcon,
@@ -7,6 +8,11 @@ import {
   ClockIcon,
   ShieldCheckIcon,
 } from "./Icons";
+import {
+  viewportConfig,
+  staggerContainer,
+  fadeInUp,
+} from "./animations";
 
 const features = [
   {
@@ -45,17 +51,33 @@ const FeatureGrid = () => {
   return (
     <section className="zm-section zm-feature-grid-section">
       <div className="zm-container">
-        <div className="zm-feature-grid">
+        <motion.div
+          className="zm-feature-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
           {features.map((feature, idx) => (
-            <div key={idx} className="zm-feature-card">
-              <div className="zm-feature-icon-badge">
+            <motion.div
+              key={idx}
+              className="zm-feature-card"
+              variants={fadeInUp}
+              whileHover={{ scale: 1.03, y: -4 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <motion.div
+                className="zm-feature-icon-badge"
+                whileHover={{ rotate: 12, scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 {feature.icon}
-              </div>
+              </motion.div>
               <h3 className="zm-feature-title">{feature.title}</h3>
               <p className="zm-feature-desc">{feature.description}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

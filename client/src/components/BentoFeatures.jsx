@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   SparklesIcon,
   VideoIcon,
@@ -9,13 +10,25 @@ import {
   CheckCircleIcon,
   UsersIcon,
 } from "./Icons";
+import {
+  viewportConfig,
+  staggerContainer,
+  fadeInUp,
+  floatingAnimation,
+} from "./animations";
 
 const BentoFeatures = () => {
   return (
     <section className="zm-section zm-bento-section" id="features">
       <div className="zm-container">
         {/* Section Header */}
-        <div className="zm-bento-header">
+        <motion.div
+          className="zm-bento-header"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeInUp}
+        >
           <div className="zm-bento-header-left">
             <div className="zm-eyebrow-pill">
               <span className="zm-eyebrow-dot"></span>
@@ -31,12 +44,21 @@ const BentoFeatures = () => {
               ZeesuMeet combines real-time video, instant code sync, and interactive sprint tools to help engineering teams connect faster and stay in sync every day.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Bento Grid */}
-        <div className="zm-bento-grid">
+        <motion.div
+          className="zm-bento-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
           {/* Large Left Card - Phone Mockup with Circular Progress */}
-          <div className="zm-bento-card zm-bento-card-large-hero">
+          <motion.div
+            className="zm-bento-card zm-bento-card-large-hero"
+            variants={fadeInUp}
+          >
             <div className="zm-bento-hero-text">
               <h3>Stay Focused, Stay Present</h3>
               <p>
@@ -44,8 +66,11 @@ const BentoFeatures = () => {
               </p>
             </div>
 
-            {/* Mobile Phone Mockup */}
-            <div className="zm-phone-mockup-wrapper">
+            {/* Mobile Phone Mockup with Floating Animation */}
+            <motion.div
+              className="zm-phone-mockup-wrapper"
+              {...floatingAnimation}
+            >
               <div className="zm-phone-frame">
                 <div className="zm-phone-notch"></div>
                 <div className="zm-phone-content">
@@ -55,8 +80,8 @@ const BentoFeatures = () => {
                   </div>
 
                   <div className="zm-phone-stat-title">Pairing Session</div>
-                  
-                  {/* Circular Progress Ring */}
+
+                  {/* Circular Progress Ring with Animated Stroke */}
                   <div className="zm-circular-progress-box">
                     <svg className="zm-progress-svg" viewBox="0 0 120 120">
                       <circle
@@ -65,13 +90,16 @@ const BentoFeatures = () => {
                         r="48"
                         className="zm-progress-bg"
                       />
-                      <circle
+                      <motion.circle
                         cx="60"
                         cy="60"
                         r="48"
                         className="zm-progress-fill"
                         strokeDasharray="301.59"
-                        strokeDashoffset="45"
+                        initial={{ strokeDashoffset: 301.59 }}
+                        whileInView={{ strokeDashoffset: 45 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
                       />
                     </svg>
                     <div className="zm-progress-inner-text">
@@ -90,13 +118,18 @@ const BentoFeatures = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right Column Layout */}
           <div className="zm-bento-right-col">
             {/* Top-Right Card */}
-            <div className="zm-bento-card zm-bento-card-top-right">
+            <motion.div
+              className="zm-bento-card zm-bento-card-top-right"
+              variants={fadeInUp}
+              whileHover={{ y: -5, scale: 1.01 }}
+              transition={{ duration: 0.25 }}
+            >
               <div className="zm-bento-card-header">
                 <h3>Plan Smarter Sessions</h3>
                 <p>
@@ -104,7 +137,10 @@ const BentoFeatures = () => {
                 </p>
               </div>
               <div className="zm-mini-schedule-list">
-                <div className="zm-schedule-item">
+                <motion.div
+                  className="zm-schedule-item"
+                  whileHover={{ scale: 1.02 }}
+                >
                   <div className="zm-schedule-icon zm-icon-amber">
                     <CodeIcon size={16} />
                   </div>
@@ -112,9 +148,12 @@ const BentoFeatures = () => {
                     <span className="zm-schedule-name">Sprint Pair Review</span>
                     <span className="zm-schedule-time">10:00 AM • Room DEV-92</span>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="zm-schedule-item">
+                <motion.div
+                  className="zm-schedule-item"
+                  whileHover={{ scale: 1.02 }}
+                >
                   <div className="zm-schedule-icon zm-icon-purple">
                     <VideoIcon size={16} />
                   </div>
@@ -122,21 +161,26 @@ const BentoFeatures = () => {
                     <span className="zm-schedule-name">Architecture Alignment</span>
                     <span className="zm-schedule-time">02:30 PM • Room ARCH-01</span>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Bottom-Right 2-Split */}
             <div className="zm-bento-bottom-split">
               {/* Bottom-Left Card: Milestone / Progress Tracker */}
-              <div className="zm-bento-card zm-bento-card-milestone">
+              <motion.div
+                className="zm-bento-card zm-bento-card-milestone"
+                variants={fadeInUp}
+                whileHover={{ y: -5, scale: 1.02 }}
+                transition={{ duration: 0.25 }}
+              >
                 <h3>Collaborate Every Milestone</h3>
                 <p>Track team velocity & live commits during video pairing.</p>
                 <div className="zm-app-icon-row">
-                  <div className="zm-app-pill" title="VS Code"><CodeIcon size={16} /></div>
-                  <div className="zm-app-pill" title="GitHub"><GithubIcon size={16} /></div>
-                  <div className="zm-app-pill" title="Live Video"><VideoIcon size={16} /></div>
-                  <div className="zm-app-pill" title="Sync"><SparklesIcon size={16} /></div>
+                  <motion.div className="zm-app-pill" whileHover={{ scale: 1.15 }} title="VS Code"><CodeIcon size={16} /></motion.div>
+                  <motion.div className="zm-app-pill" whileHover={{ scale: 1.15 }} title="GitHub"><GithubIcon size={16} /></motion.div>
+                  <motion.div className="zm-app-pill" whileHover={{ scale: 1.15 }} title="Live Video"><VideoIcon size={16} /></motion.div>
+                  <motion.div className="zm-app-pill" whileHover={{ scale: 1.15 }} title="Sync"><SparklesIcon size={16} /></motion.div>
                 </div>
                 <div className="zm-milestone-bar-box">
                   <div className="zm-milestone-label-row">
@@ -144,13 +188,24 @@ const BentoFeatures = () => {
                     <span>92% Done</span>
                   </div>
                   <div className="zm-milestone-bar">
-                    <div className="zm-milestone-fill" style={{ width: "92%" }}></div>
+                    <motion.div
+                      className="zm-milestone-fill"
+                      initial={{ width: "0%" }}
+                      whileInView={{ width: "92%" }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                    ></motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Bottom-Right Card: Stats Leaderboard */}
-              <div className="zm-bento-card zm-bento-card-stats">
+              <motion.div
+                className="zm-bento-card zm-bento-card-stats"
+                variants={fadeInUp}
+                whileHover={{ y: -5, scale: 1.02 }}
+                transition={{ duration: 0.25 }}
+              >
                 <h3>Track Your Productivity</h3>
                 <p>Automated session time & code sync metrics.</p>
                 <div className="zm-stats-list">
@@ -173,10 +228,10 @@ const BentoFeatures = () => {
                     <span className="zm-stats-value">5.5 hrs sync</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

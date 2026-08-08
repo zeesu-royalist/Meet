@@ -1,12 +1,28 @@
 import React from "react";
+import { motion } from "framer-motion";
+import {
+  viewportConfig,
+  staggerContainer,
+  fadeInUp,
+} from "./animations";
 
 const Testimonials = () => {
   return (
     <section className="zm-section zm-testimonials-section" id="testimonials">
       <div className="zm-container">
         {/* Header Row */}
-        <div className="zm-testimonials-header">
+        <motion.div
+          className="zm-testimonials-header"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+          variants={fadeInUp}
+        >
           <div className="zm-testimonials-header-left">
+            <div className="zm-eyebrow-pill">
+              <span className="zm-eyebrow-dot"></span>
+              Wall of Love
+            </div>
             <h2 className="zm-testimonials-heading">
               Empowering Thousands <br />
               Through Better Real-Time Sync
@@ -17,15 +33,27 @@ const Testimonials = () => {
               ZeesuMeet helps developers, engineering leads, and peer coders improve focus and build seamless real-time video habits with personalized room insights.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Masonry / Grid Layout matching reference image */}
-        <div className="zm-testimonials-masonry-grid">
+        <motion.div
+          className="zm-testimonials-masonry-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
           {/* Top-Left Card: Text Quote */}
-          <div className="zm-t-card zm-t-card-text">
+          <motion.div
+            className="zm-t-card zm-t-card-text"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -4 }}
+            transition={{ duration: 0.25 }}
+          >
+            <span className="zm-quote-watermark">“</span>
             <div className="zm-t-author-row">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1758598304200-f89a1d8ebedb?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Emily Carter"
                 className="zm-t-avatar"
               />
@@ -37,16 +65,24 @@ const Testimonials = () => {
             <p className="zm-t-quote">
               "ZeesuMeet transformed our daily standups. From real-time screen shares to instant video notes, it keeps our team focused and aligned in one place."
             </p>
-          </div>
+          </motion.div>
 
           {/* Center Column: Large Vertical Photo Card */}
-          <div className="zm-t-card zm-t-card-photo zm-t-center-photo">
+          <motion.div
+            className="zm-t-card zm-t-card-photo zm-t-center-photo"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -4 }}
+            transition={{ duration: 0.25 }}
+          >
             <img
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop"
+              src="https://plus.unsplash.com/premium_photo-1661541247532-a06915d0d3ab?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Jessica Watson"
               className="zm-t-full-img"
             />
-            <div className="zm-t-photo-overlay-badge">
+            <motion.div
+              className="zm-t-photo-overlay-badge"
+              whileHover={{ scale: 1.03 }}
+            >
               <img
                 src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&auto=format&fit=crop"
                 alt="Jessica Watson Avatar"
@@ -56,14 +92,20 @@ const Testimonials = () => {
                 <div className="zm-t-overlay-name">Jessica Watson</div>
                 <div className="zm-t-overlay-role">University Student</div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Top-Right Card: Text Quote */}
-          <div className="zm-t-card zm-t-card-text">
+          <motion.div
+            className="zm-t-card zm-t-card-text"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -4 }}
+            transition={{ duration: 0.25 }}
+          >
+            <span className="zm-quote-watermark">“</span>
             <div className="zm-t-author-row">
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=120&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1642736468716-cc5836558a74?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="David Chen"
                 className="zm-t-avatar"
               />
@@ -75,16 +117,24 @@ const Testimonials = () => {
             <p className="zm-t-quote">
               "Direct WebRTC audio and glass-like screen clarity. It feels like standing right next to my teammate in front of a physical whiteboard."
             </p>
-          </div>
+          </motion.div>
 
           {/* Bottom-Left Photo Card */}
-          <div className="zm-t-card zm-t-card-photo">
+          <motion.div
+            className="zm-t-card zm-t-card-photo"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -4 }}
+            transition={{ duration: 0.25 }}
+          >
             <img
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1616587226960-4a03badbe8bf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Michael Green"
               className="zm-t-full-img"
             />
-            <div className="zm-t-photo-overlay-badge">
+            <motion.div
+              className="zm-t-photo-overlay-badge"
+              whileHover={{ scale: 1.03 }}
+            >
               <img
                 src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop"
                 alt="Michael Green Avatar"
@@ -94,17 +144,25 @@ const Testimonials = () => {
                 <div className="zm-t-overlay-name">Michael Green</div>
                 <div className="zm-t-overlay-role">Lead Developer</div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Bottom-Right Photo Card */}
-          <div className="zm-t-card zm-t-card-photo">
+          <motion.div
+            className="zm-t-card zm-t-card-photo"
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, y: -4 }}
+            transition={{ duration: 0.25 }}
+          >
             <img
-              src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1628645339131-0c39c7527856?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Sophia Williams"
               className="zm-t-full-img"
             />
-            <div className="zm-t-photo-overlay-badge">
+            <motion.div
+              className="zm-t-photo-overlay-badge"
+              whileHover={{ scale: 1.03 }}
+            >
               <img
                 src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=100&auto=format&fit=crop"
                 alt="Sophia Williams Avatar"
@@ -114,9 +172,9 @@ const Testimonials = () => {
                 <div className="zm-t-overlay-name">Sophia Williams</div>
                 <div className="zm-t-overlay-role">Senior Frontend Engineer</div>
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

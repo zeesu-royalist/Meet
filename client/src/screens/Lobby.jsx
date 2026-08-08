@@ -18,15 +18,19 @@ import {
   SparklesIcon,
   CloseIcon,
   ZapIcon,
-  LockIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  StarIcon,
   GithubIcon,
   InstagramIcon,
   FacebookIcon,
   LinkedinIcon,
 } from "../components/Icons";
+import FeatureGrid from "../components/FeatureGrid";
+import BentoFeatures from "../components/BentoFeatures";
+import HowItWorks from "../components/HowItWorks";
+import IntegrationStrip from "../components/IntegrationStrip";
+import ImageFeatureSplit from "../components/ImageFeatureSplit";
+import Pricing from "../components/Pricing";
+import Testimonials from "../components/Testimonials";
+import FinalCTA from "../components/FinalCTA";
 
 const LobbyScreen = () => {
   const [email, setEmail] = useState(() => localStorage.getItem("zeesu_user_email") || "");
@@ -34,7 +38,6 @@ const LobbyScreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create"); // 'create' | 'join' | 'developer'
-  const [activeFaq, setActiveFaq] = useState(null);
 
   const socket = useSocket();
   const navigate = useNavigate();
@@ -55,10 +58,6 @@ const LobbyScreen = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-  };
-
-  const toggleFaq = (index) => {
-    setActiveFaq(activeFaq === index ? null : index);
   };
 
   const handleSubmitForm = useCallback(
@@ -95,25 +94,6 @@ const LobbyScreen = () => {
       socket.off("room:join", handleJoinRoom);
     };
   }, [socket, handleJoinRoom]);
-
-  const faqs = [
-    {
-      q: "Do I or my team need to install any apps?",
-      a: "No! ZeesuMeet is 100% web-native. Anyone can join or host HD video calls instantly in any modern browser without downloading plugins or extensions.",
-    },
-    {
-      q: "How does the WebRTC peer-to-peer connection work?",
-      a: "Your audio and video streams travel directly between participants with zero media servers in between, minimizing latency to less than 50 milliseconds.",
-    },
-    {
-      q: "Is ZeesuMeet secure and encrypted?",
-      a: "Yes. All video, audio, and data channels use industry-standard WebRTC DTLS-SRTP end-to-end encryption to keep your conversations private.",
-    },
-    {
-      q: "How many participants can join a single room?",
-      a: "ZeesuMeet optimizes peer-to-peer meshes for agile team meetings of up to 10 active participants with instant video grid rendering.",
-    },
-  ];
 
   return (
     <div className="ZeesuMeet-landing">
@@ -350,229 +330,29 @@ const LobbyScreen = () => {
           Everything remote engineering squads, tech leads, and peer developers need to connect, review code, and build faster.
         </p>
 
-        <div className="bc-features-grid">
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <ZapIcon size={22} />
-            </div>
-            <h3>Ultra-Low Latency P2P</h3>
-            <p>Direct WebRTC peer connections eliminate media server hops for sub-50ms glass-to-glass latency.</p>
-          </div>
-
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <VideoIcon size={22} />
-            </div>
-            <h3>HD Video & Crystal Audio</h3>
-            <p>Adaptive noise suppression and high-definition video encoding tailored for seamless pair programming.</p>
-          </div>
-
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <ScreenShareIcon size={22} />
-            </div>
-            <h3>Instant Screen Sharing</h3>
-            <p>Share any browser window, IDE, terminal, or full display effortlessly with crisp 60fps streaming.</p>
-          </div>
-
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <ChatIcon size={22} />
-            </div>
-            <h3>In-Meeting Live Chat</h3>
-            <p>Send text messages, links, and code snippets in real-time during your video session without leaving the screen.</p>
-          </div>
-
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <LockIcon size={22} />
-            </div>
-            <h3>End-to-End Encrypted</h3>
-            <p>Built with DTLS-SRTP WebRTC protocols ensuring your audio, video, and data channels remain 100% private.</p>
-          </div>
-
-          <div className="bc-feature-card">
-            <div className="bc-feature-icon-box">
-              <UsersIcon size={22} />
-            </div>
-            <h3>Zero Download Instant Rooms</h3>
-            <p>Generate shareable room links that open instantly in any browser on desktop, tablet, or mobile.</p>
-          </div>
-        </div>
+        <FeatureGrid />
       </section>
 
-      {/* METRICS / STATS BANNER */}
-      <section className="bc-stats-section">
-        <div className="bc-stats-grid">
-          <div className="bc-stat-card">
-            <div className="bc-stat-num">&lt; 50ms</div>
-            <div className="bc-stat-label">Sub-50ms Latency</div>
-          </div>
-          <div className="bc-stat-card">
-            <div className="bc-stat-num">100%</div>
-            <div className="bc-stat-label">E2E Encrypted P2P</div>
-          </div>
-          <div className="bc-stat-card">
-            <div className="bc-stat-num">1080p60</div>
-            <div className="bc-stat-label">Full HD Quality</div>
-          </div>
-          <div className="bc-stat-card">
-            <div className="bc-stat-num">0</div>
-            <div className="bc-stat-label">Downloads Required</div>
-          </div>
-        </div>
-      </section>
+      {/* 2. 'EVERYTHING YOU NEED' BENTO GRID SECTION */}
+      <BentoFeatures />
 
-      {/* DEVELOPER SHOWCASE / SOLUTIONS */}
-      <section className="bc-showcase-section" id="solutions">
-        <div className="bc-showcase-card">
-          <div className="bc-showcase-grid">
-            <div className="bc-showcase-content">
-              <h2>Engineered for technical teams who ship fast</h2>
-              <p>
-                Whether conducting daily standups, architectural code reviews, or pairing on complex bug fixes, ZeesuMeet gives your team friction-free video calling.
-              </p>
-              <ul className="bc-showcase-list">
-                <li><CheckIcon size={16} /> Instant WebRTC P2P signaling</li>
-                <li><CheckIcon size={16} /> Lightweight, browser-native memory footprint</li>
-                <li><CheckIcon size={16} /> Integrated code-sharing & live chat workspace</li>
-              </ul>
-            </div>
+      {/* 3. 'HOW IT WORKS' HUB DIAGRAM */}
+      <HowItWorks />
 
-            <div className="bc-showcase-preview-box">
-              <div className="bc-code-mockup">
-                <div><span className="keyword">import</span> &#123; ZeesuMeet &#125; <span className="keyword">from</span> <span className="string">"@ZeesuMeet/core"</span>;</div>
-                <br />
-                <div><span className="keyword">const</span> room = <span className="keyword">await</span> ZeesuMeet.<span className="function">createRoom</span>(&#123;</div>
-                <div>&nbsp;&nbsp;roomCode: <span className="string">"DEV-PAIR-SYNC"</span>,</div>
-                <div>&nbsp;&nbsp;video: <span className="keyword">true</span>,</div>
-                <div>&nbsp;&nbsp;audio: <span className="keyword">true</span>,</div>
-                <div>&nbsp;&nbsp;encryption: <span className="string">"DTLS-SRTP"</span></div>
-                <div>&#125;);</div>
-                <br />
-                <div>room.<span className="function">on</span>(<span className="string">"peer:join"</span>, (peer) =&gt; &#123;</div>
-                <div>&nbsp;&nbsp;console.<span className="function">log</span>(<span className="string">`Peer connected!`</span>);</div>
-                <div>&#125;);</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 4. LOGO / COMPATIBILITY STRIP */}
+      <IntegrationStrip />
 
-      {/* TESTIMONIALS / WALL OF LOVE */}
-      <section className="bc-testimonials-section" id="testimonials">
-        <div className="bc-section-badge">
-          <StarIcon size={14} /> Wall of Love
-        </div>
-        <h2 className="bc-section-title">Loved by developers worldwide</h2>
-        <p className="bc-section-subtitle">
-          Here is what engineering leaders and developers say about ZeesuMeet's speed and clarity.
-        </p>
+      {/* 5. IMAGE + FEATURE LIST SECTION */}
+      <ImageFeatureSplit />
 
-        <div className="bc-testimonials-grid">
-          <div className="bc-testimonial-card">
-            <div className="bc-stars-row">
-              <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
-            </div>
-            <p className="bc-testimonial-quote">
-              "ZeesuMeet replaced our heavy desktop meeting software. Launching a room in one click for pair programming has doubled our debugging velocity."
-            </p>
-            <div className="bc-testimonial-author">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop"
-                alt="Sarah Jenkins"
-              />
-              <div>
-                <div className="bc-author-name">Sarah Jenkins</div>
-                <div className="bc-author-role">Staff Frontend Engineer</div>
-              </div>
-            </div>
-          </div>
+      {/* 6. PRICING SECTION */}
+      <Pricing handleOpenModal={handleOpenModal} />
 
-          <div className="bc-testimonial-card">
-            <div className="bc-stars-row">
-              <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
-            </div>
-            <p className="bc-testimonial-quote">
-              "The WebRTC sub-50ms audio latency is insane. It feels like standing right next to my teammate in front of a whiteboard."
-            </p>
-            <div className="bc-testimonial-author">
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=120&auto=format&fit=crop"
-                alt="David Chen"
-              />
-              <div>
-                <div className="bc-author-name">David Chen</div>
-                <div className="bc-author-role">CTO at StackFlow</div>
-              </div>
-            </div>
-          </div>
+      {/* 7. TESTIMONIALS SECTION */}
+      <Testimonials />
 
-          <div className="bc-testimonial-card">
-            <div className="bc-stars-row">
-              <StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon />
-            </div>
-            <p className="bc-testimonial-quote">
-              "Zero downloads, zero friction. I just share the room code with candidate developers and we jump straight into the technical interview."
-            </p>
-            <div className="bc-testimonial-author">
-              <img
-                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=120&auto=format&fit=crop"
-                alt="Elena Rostova"
-              />
-              <div>
-                <div className="bc-author-name">Elena Rostova</div>
-                <div className="bc-author-role">Engineering Manager</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ SECTION */}
-      <section className="bc-faq-section" id="faq">
-        <div className="bc-section-badge">
-          <SparklesIcon size={14} /> Got Questions?
-        </div>
-        <h2 className="bc-section-title">Frequently Asked Questions</h2>
-        <p className="bc-section-subtitle">
-          Everything you need to know about ZeesuMeet video conferencing.
-        </p>
-
-        <div className="bc-faq-list">
-          {faqs.map((faq, index) => (
-            <div key={index} className="bc-faq-item">
-              <button className="bc-faq-question" onClick={() => toggleFaq(index)}>
-                <span>{faq.q}</span>
-                <ChevronDownIcon
-                  size={18}
-                  style={{
-                    transform: activeFaq === index ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                />
-              </button>
-              {activeFaq === index && <div className="bc-faq-answer">{faq.a}</div>}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* BOTTOM CTA BANNER */}
-      <section className="bc-cta-section">
-        <div className="bc-cta-card">
-          <h2>Start collaborating in seconds</h2>
-          <p>Create your custom room or join an existing session now. No sign-up required.</p>
-          <div className="bc-cta-buttons">
-            <button className="bc-cta-btn-white" onClick={() => handleOpenModal("create")}>
-              <VideoIcon size={18} /> Create a Room Now
-            </button>
-            <button className="bc-cta-btn-glass" onClick={() => handleOpenModal("join")}>
-              <UsersIcon size={18} /> Join Session
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* 8. FINAL CTA SECTION */}
+      <FinalCTA handleOpenModal={handleOpenModal} />
 
       {/* COMPREHENSIVE SAAS FOOTER */}
       <footer className="bc-footer">

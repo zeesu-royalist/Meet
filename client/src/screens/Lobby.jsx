@@ -23,8 +23,9 @@ import {
   ChevronDownIcon,
   StarIcon,
   GithubIcon,
-  TwitterIcon,
-  DiscordIcon,
+  InstagramIcon,
+  FacebookIcon,
+  LinkedinIcon,
 } from "../components/Icons";
 
 const LobbyScreen = () => {
@@ -579,15 +580,36 @@ const LobbyScreen = () => {
           <div className="bc-footer-brand-col">
             <div className="bc-nav-brand" onClick={() => navigate("/")}>
               <ZeesuMeetLogo size={28} />
-              <span>ZeesuMeet</span>
+              <span>Zeesu<span style={{ color: "var(--primary-purple-hover)" }}>Meet</span></span>
             </div>
             <p>
               Next-generation browser video conferencing designed for remote developers, engineering squads, and modern teams.
             </p>
             <div className="bc-social-links">
-              <div className="bc-social-icon" title="GitHub"><GithubIcon size={18} /></div>
-              <div className="bc-social-icon" title="Twitter"><TwitterIcon size={18} /></div>
-              <div className="bc-social-icon" title="Discord"><DiscordIcon size={18} /></div>
+              <a
+                href="https://www.instagram.com/zeesu_royalist/"
+                rel="noopener noreferrer"
+                className="bc-social-icon"
+                title="Instagram"
+              >
+                <InstagramIcon size={18} />
+              </a>
+              <a
+                href="https://www.facebook.com/p/Zeesu-Royalist-100064169071412/"
+                rel="noopener noreferrer"
+                className="bc-social-icon"
+                title="Facebook"
+              >
+                <FacebookIcon size={18} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/zeesu-royalist/"
+                rel="noopener noreferrer"
+                className="bc-social-icon"
+                title="LinkedIn"
+              >
+                <LinkedinIcon size={18} />
+              </a>
             </div>
           </div>
 

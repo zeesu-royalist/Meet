@@ -272,10 +272,10 @@ const LobbyScreen = () => {
                 <div className="bc-tile-secondary">
                   <img
                     src="https://images.unsplash.com/photo-1629204814140-42a737865119?q=80&w=2070&auto=format&fit=crop"
-                    alt="Priya Sharma"
+                    alt="Jone admo"
                   />
                   <div className="bc-tile-overlay-bottom">
-                    <span>Priya Sharma</span>
+                    <span>Jone admo</span>
                   </div>
                 </div>
               </div>

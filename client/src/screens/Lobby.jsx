@@ -242,10 +242,10 @@ const LobbyScreen = () => {
                 <div className="bc-tile-secondary">
                   <img
                     src="https://images.unsplash.com/photo-1713947506048-80f76419b2fe?q=80&w=2232&auto=format&fit=crop"
-                    alt="Rohan Singh"
+                    alt="Rita"
                   />
                   <div className="bc-tile-overlay-bottom">
-                    <span>Rohan Singh</span>
+                    <span>Rita</span>
                   </div>
                 </div>
 
@@ -262,10 +262,10 @@ const LobbyScreen = () => {
                 <div className="bc-tile-secondary">
                   <img
                     src="https://plus.unsplash.com/premium_photo-1661724998638-7b85a2d0d57a?q=80&w=2070&auto=format&fit=crop"
-                    alt="Alex Morgan"
+                    alt="Ayli Nensi"
                   />
                   <div className="bc-tile-overlay-bottom">
-                    <span>Alex Morgan</span>
+                    <span>Ayli Nensi</span>
                   </div>
                 </div>
 
